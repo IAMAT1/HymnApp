@@ -3,6 +3,8 @@ import { Play, Heart, ChevronLeft, ChevronRight, Loader2, Clock } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Song } from '@/types/music';
 import completeMusicService from '@/services/completeMusicService';
+import { comprehensiveMusicService } from '@/services/comprehensiveMusicService';
+
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 import { useLikedSongs } from '@/hooks/useLikedSongs';
 import { useAuth } from '@/contexts/AuthContext';
