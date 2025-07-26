@@ -26,7 +26,9 @@ interface ConnectionTestResult {
 }
 
 class CompleteMusicService {
-  private baseURL = '/.netlify/functions';
+  private baseURL = window.location.hostname.includes('netlify.app') 
+    ? '/.netlify/functions' 
+    : '/api';
 
   /**
    * Test connection to all music APIs
@@ -55,13 +57,12 @@ class CompleteMusicService {
         throw new Error('Search query cannot be empty');
       }
 
-      const response = await fetch(`${this.baseURL}/complete-music-search?q=${encodeURIComponent(query)}`);
+      const response = await fetch(`${this.baseURL}/complete-music-search?q=${encodeURIComponent(query)}&limit=20`);
       
       if (!response.ok) {
-        if (response.status === 404) {
-          return []; // No results found
-        }
-        throw new Error(`Search failed: ${response.status}`);
+        console.error(`API response error: ${response.status}`);
+        // Fallback to basic search if comprehensive search fails
+        return this.fallbackSearch(query);
       }
       
       const data: SearchResponse = await response.json();
