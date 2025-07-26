@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Audio Stream</title>
+</head>
+<body>
+    <h1>Audio Stream Debug</h1>
+    
+    <!-- Test direct external backend -->
+    <h2>Direct External Backend</h2>
+    <audio controls id="directAudio">
+        <source src="https://functions-offers-audit-insertion.trycloudflare.com/stream?v=6wkwmDzZ3n4" type="audio/mp4">
+        <source src="https://functions-offers-audit-insertion.trycloudflare.com/stream?v=6wkwmDzZ3n4" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Test through local proxy -->
+    <h2>Through Local Proxy</h2>
+    <audio controls id="proxyAudio">
+        <source src="http://localhost:5000/api/stream?v=6wkwmDzZ3n4" type="audio/mp4">
+        <source src="http://localhost:5000/api/stream?v=6wkwmDzZ3n4" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <div id="output"></div>
+    
+    <script>
+        const directAudio = document.getElementById('directAudio');
+        const proxyAudio = document.getElementById('proxyAudio');
+        const output = document.getElementById('output');
+        
+        function logEvent(prefix, e) {
+            const msg = `${prefix}: ${e.type}`;
+            console.log(msg);
+            output.innerHTML += `<div>${msg}</div>`;
+            
+            if (e.type === 'error' && e.target.error) {
+                const errorMsg = `${prefix} ERROR: Code ${e.target.error.code} - ${e.target.error.message}`;
+                console.error(errorMsg);
+                output.innerHTML += `<div style="color: red;">${errorMsg}</div>`;
+            }
+        }
+        
+        // Direct audio events
+        ['loadstart', 'loadeddata', 'canplay', 'playing', 'error'].forEach(event => {
+            directAudio.addEventListener(event, (e) => logEvent('DIRECT', e));
+        });
+        
+        // Proxy audio events
+        ['loadstart', 'loadeddata', 'canplay', 'playing', 'error'].forEach(event => {
+            proxyAudio.addEventListener(event, (e) => logEvent('PROXY', e));
+        });
+    </script>
+</body>
+</html>

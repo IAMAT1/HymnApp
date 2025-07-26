@@ -1,0 +1,39 @@
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: false pendingSong: undefined
+Starting to play song: Still Rollin by Shubh
+Getting stream URL for: Still Rollin
+getStreamUrlOptimized called with: Still Rollin by Shubh
+Searching YouTube for: Still Rollin by Shubh
+Using cached video ID for: still rollin shubh
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Found YouTube video ID: 0mCVpUDCkEk
+Preload warning (non-critical): 
+ReferenceError {}
+Stream URL: https://dc399c7d-8f53-4258-b9ef-58b2b941c9aa-00-6335g6brxxj1.sisko.replit.dev/api/stream?v=0mCVpUDCkEk
+Song is cached, playing immediately
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Audio play event fired (but not necessarily streaming yet)
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Audio error occurred
+Error playing cached song
+Error in playSong: 
+DOMException {code: 9, name: "NotSupportedError", message: "Failed to load because no supported source was found.", INDEX_SIZE_ERR: 1, DOMSTRING_SIZE_ERR: 2, …}
+
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: false pendingSong: undefined
+Starting to play song: Still Rollin by Shubh
+Getting stream URL for: Still Rollin
+getStreamUrlOptimized called with: Still Rollin by Shubh
+Searching YouTube for: Still Rollin by Shubh
+Using cached video ID for: still rollin shubh
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Found YouTube video ID: 0mCVpUDCkEk
+Preload warning (non-critical): 
+ReferenceError {}
+Stream URL: https://dc399c7d-8f53-4258-b9ef-58b2b941c9aa-00-6335g6brxxj1.sisko.replit.dev/api/stream?v=0mCVpUDCkEk
+Song is cached, playing immediately
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Audio play event fired (but not necessarily streaming yet)
+MusicPlayerBar render - currentSong: Still Rollin isPlaying: false loading: true pendingSong: Still Rollin
+Audio error occurred
+Error playing cached song
+Error in playSong: 
+DOMException {code: 9, name: "NotSupportedError", message: "Failed to load because no supported source was found.", INDEX_SIZE_ERR: 1, DOMSTRING_SIZE_ERR: 2, …}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Test</title>
+</head>
+<body>
+    <h1>Audio Stream Test</h1>
+    <audio controls id="audioPlayer">
+        <source src="http://localhost:5000/api/stream?v=6wkwmDzZ3n4" type="audio/mp4">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <br><br>
+    
+    <button onclick="testPlay()">Test Play</button>
+    <button onclick="checkHeaders()">Check Headers</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const output = document.getElementById('output');
+        
+        audio.addEventListener('loadstart', () => console.log('loadstart'));
+        audio.addEventListener('loadedmetadata', () => console.log('loadedmetadata'));
+        audio.addEventListener('canplay', () => console.log('canplay'));
+        audio.addEventListener('playing', () => console.log('playing'));
+        audio.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            output.innerHTML += '<div>Audio error: ' + JSON.stringify(e.target.error) + '</div>';
+        });
+        
+        function testPlay() {
+            audio.play().catch(e => {
+                console.error('Play failed:', e);
+                output.innerHTML += '<div>Play failed: ' + e.message + '</div>';
+            });
+        }
+        
+        async function checkHeaders() {
+            try {
+                const response = await fetch('http://localhost:5000/api/stream?v=6wkwmDzZ3n4', {method: 'HEAD'});
+                output.innerHTML += '<div>Headers: ' + JSON.stringify(Object.fromEntries(response.headers.entries())) + '</div>';
+            } catch (e) {
+                output.innerHTML += '<div>Fetch error: ' + e.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

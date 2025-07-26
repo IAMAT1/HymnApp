@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Player Test</title>
+</head>
+<body>
+    <h1>YouTube Player Test</h1>
+    <div id="player"></div>
+    <div>
+        <button id="play-btn">Play</button>
+        <button id="pause-btn">Pause</button>
+        <button id="test-karan">Test Karan Aujla</button>
+        <button id="test-arijit">Test Arijit Singh</button>
+    </div>
+    <div id="status"></div>
+
+    <script>
+        // Load YouTube IFrame API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var statusDiv = document.getElementById('status');
+
+        function onYouTubeIframeAPIReady() {
+            statusDiv.innerHTML = 'YouTube API loaded, creating player...';
+            
+            player = new YT.Player('player', {
+                height: '200',
+                width: '300',
+                videoId: 'yAmVzCPcMWk', // Karan Aujla - Tauba Tauba
+                playerVars: {
+                    'controls': 1,
+                    'modestbranding': 1,
+                    'rel': 0
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            statusDiv.innerHTML = 'Player ready! You can now control playback.';
+            
+            document.getElementById('play-btn').onclick = function() {
+                player.playVideo();
+                statusDiv.innerHTML = 'Playing...';
+            };
+            
+            document.getElementById('pause-btn').onclick = function() {
+                player.pauseVideo();
+                statusDiv.innerHTML = 'Paused.';
+            };
+            
+            document.getElementById('test-karan').onclick = function() {
+                player.loadVideoById('yAmVzCPcMWk'); // Karan Aujla
+                statusDiv.innerHTML = 'Loading Karan Aujla - Tauba Tauba...';
+            };
+            
+            document.getElementById('test-arijit').onclick = function() {
+                player.loadVideoById('LfnRhbDuGWs'); // Arijit Singh
+                statusDiv.innerHTML = 'Loading Arijit Singh - Tum Hi Ho...';
+            };
+        }
+
+        function onPlayerStateChange(event) {
+            var states = {
+                '-1': 'Unstarted',
+                '0': 'Ended',
+                '1': 'Playing',
+                '2': 'Paused',
+                '3': 'Buffering',
+                '5': 'Video cued'
+            };
+            statusDiv.innerHTML = 'Player State: ' + states[event.data];
+        }
+
+        function onPlayerError(event) {
+            statusDiv.innerHTML = 'Player Error: ' + event.data;
+            console.error('YouTube player error:', event.data);
+        }
+
+        // Test YouTube search API
+        async function testSearch() {
+            try {
+                const response = await fetch('/api/music/youtube/search?q=karan%20aujla%20tauba%20tauba');
+                const data = await response.json();
+                console.log('Search result:', data);
+                statusDiv.innerHTML += '<br>Search result: ' + JSON.stringify(data);
+            } catch (error) {
+                console.error('Search error:', error);
+                statusDiv.innerHTML += '<br>Search error: ' + error.message;
+            }
+        }
+
+        // Auto-test search on load
+        setTimeout(testSearch, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+Core System Overview
+Your app implements a segmented, progressive audio streaming backend for YouTube audio, optimized for instant playback and resource-efficient delivery.
+
+Main Features
+Segmented Audio Delivery
+
+Streams audio in segments: first 15 seconds (segment 0), then 30-second chunks (segment 1, 2, ...)
+
+Each segment is served via /stream?v=VIDEO_ID&segment=N; only the first short chunk is prioritized for minimal delay.
+
+Segments are cached on disk for later/faster access.
+
+Prefetch & Progressive Downloading
+
+As soon as segment 0 starts, segments 1–3 are automatically pre-downloaded in parallel—ensuring seamless playback with no waiting between chunks.
+
+Intelligent concurrency (up to 3 parallel downloads) for best performance without overloading the device.
+
+Robust Endpoint Design
+
+/stream endpoint supports HTTP range headers for seeking and instant segment serving.
+
+/status endpoint reports which segments are ready for each requested video.
+
+Cookie-Authenticated yt-dlp
+
+Uses your cookies.txt (Netscape format) for authenticated content download with yt-dlp.
+
+Cache Management
+
+Segments are organized by video ID and segment index, with automatic cleanup of old unused data to save space.
+
+Error Handling
+
+Retries failed downloads and falls back to full-file download if segment-based fetch fails.
+
+Handles network errors gracefully to avoid user interruption.
+
+Extensive Automation
+
+Requires no manual intervention—downloads, streams, caches, and cleans up segments automatically when triggered.
+
+What Your Replit AI Assistant Must Know
+Always check /status?v=VIDEO_ID for available segments before fetching.
+
+Use /stream?v=VIDEO_ID&segment=N to download each segment and save locally for assembly.
+
+Download all available segments in parallel when possible; poll status for new segments if the track isn’t fully cached yet.
+
+Segments can be combined into full tracks using ffmpeg or streamed sequentially for uninterrupted playback.
+
+Handle all network requests, file writes, and errors robustly; retry failed attempts as needed.
+
+Respect and adapt to any segment length or server configuration changes as defined in the status responses.
+
+In short:
+Your app delivers nearly instant YouTube audio playback by breaking audio into small, aggressively pre-fetched segments, served on-demand via efficient endpoints. Your Replit AI can interact smoothly by following the clear segmented protocol, ensuring both speed and reliability.
