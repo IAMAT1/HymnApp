@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Netlify Functions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #111;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #222;
+        }
+        button {
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1ed760;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .error {
+            background: #ff4444;
+            color: white;
+        }
+        .success {
+            background: #44ff44;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Netlify Functions API Test</h1>
+    <p>Test your music app's Netlify Functions to verify they're working correctly.</p>
+
+    <div class="test-section">
+        <h3>1. Test Search Function</h3>
+        <button onclick="testSearch()">Search for "karan aujla"</button>
+        <div id="search-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Complete Music Search</h3>
+        <button onclick="testComprehensiveSearch()">Search for "arijit singh"</button>
+        <div id="comprehensive-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Trending Music</h3>
+        <button onclick="testTrending()">Get Trending Music</button>
+        <div id="trending-result" class="result"></div>
+    </div>
+
+    <script>
+        async function testSearch() {
+            const resultDiv = document.getElementById('search-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/search?q=karan aujla');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ SUCCESS!\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ ERROR: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        async function testComprehensiveSearch() {
+            const resultDiv = document.getElementById('comprehensive-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/complete-music-search?q=arijit singh&limit=5');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ SUCCESS! Found ${data.response?.length || 0} songs\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ ERROR: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        async function testTrending() {
+            const resultDiv = document.getElementById('trending-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api/trending');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ SUCCESS! Found ${data.response?.length || 0} trending songs\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ ERROR: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ NETWORK ERROR: ${error.message}`;
+            }
+        }
+
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Testing Netlify Functions...');
+            testTrending();
+        });
+    </script>
+</body>
+</html>
