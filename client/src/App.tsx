@@ -19,6 +19,7 @@ import NowPlaying from "@/pages/NowPlaying";
 import AuthCallback from "@/pages/AuthCallback";
 import GenreSongs from "@/pages/GenreSongs";
 import NotFound from "@/pages/not-found";
+import { handleOAuthRedirect } from "@/utils/authRedirect";
 
 // Error Boundary for debugging white screen
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error?: Error }> {
