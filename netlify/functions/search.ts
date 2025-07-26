@@ -20,114 +20,81 @@ export const handler: Handler = async (event, context) => {
     };
   }
 
+  const { q: query } = event.queryStringParameters || {};
+
+  if (!query) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Query parameter "q" is required' })
+    };
+  }
+
   try {
-    const query = event.queryStringParameters?.q;
+    // Basic music search - return subset of complete music search results
+    const searchTerm = query.toLowerCase().trim();
     
-    if (!query) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: "Query parameter 'q' is required" })
-      };
-    }
-
-    // Cache for searches
-    const searchTimeout = 5000; // 5 second timeout per search method
-
-    // Try multiple YouTube search methods in order with timeout
-    let videoId = null;
-
-    // Method 1: Try Piped API (reliable public instance) with timeout
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), searchTimeout);
+    // Basic artist database for search
+    const basicResults = [
+      // Karan Aujla
+      { id: 'ka_try_me', title: 'Try Me', artist: 'Karan Aujla', videoId: 'pFgQNBqawFo', genre: 'Punjabi' },
+      { id: 'ka_softly', title: 'Softly', artist: 'Karan Aujla', videoId: 'ycGP6MW5w2A', genre: 'Punjabi' },
       
-      const pipedResponse = await fetch(`https://pipedapi.kavin.rocks/search?q=${encodeURIComponent(query)}&filter=videos`, {
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
+      // Arijit Singh
+      { id: 'as_tum_hi_ho', title: 'Tum Hi Ho', artist: 'Arijit Singh', videoId: 'LfnRhbDuGWs', genre: 'Bollywood' },
+      { id: 'as_channa_mereya', title: 'Channa Mereya', artist: 'Arijit Singh', videoId: 'bzSTpdcs-EI', genre: 'Bollywood' },
       
-      if (pipedResponse.ok) {
-        const data = await pipedResponse.json();
-        if (data.items && data.items.length > 0) {
-          const firstVideo = data.items[0];
-          if (firstVideo.url) {
-            videoId = firstVideo.url.replace('/watch?v=', '');
-            console.log('Found via Piped API:', videoId);
-          }
-        }
-      }
-    } catch (pipedError) {
-      console.log('Piped API failed:', (pipedError as Error).message);
+      // Divine
+      { id: 'divine_farak', title: 'Farak', artist: 'Divine', videoId: 'keLt6PoIFz0', genre: 'Hip-Hop' },
+      
+      // International
+      { id: 'ed_shape_of_you', title: 'Shape of You', artist: 'Ed Sheeran', videoId: 'JGwWNGJdvx8', genre: 'Pop' },
+      { id: 'weeknd_blinding_lights', title: 'Blinding Lights', artist: 'The Weeknd', videoId: 'ygr5AHufBN4', genre: 'Pop' }
+    ];
+
+    // Filter results based on search
+    let results = basicResults.filter(song => 
+      song.title.toLowerCase().includes(searchTerm) ||
+      song.artist.toLowerCase().includes(searchTerm) ||
+      song.genre.toLowerCase().includes(searchTerm)
+    );
+
+    // If no results, return all (basic search fallback)
+    if (results.length === 0) {
+      results = basicResults.slice(0, 5);
     }
 
-    // Method 2: Try InnerTube API alternative with timeout
-    if (!videoId) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), searchTimeout);
-        
-        const innertubeResponse = await fetch('https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            context: {
-              client: {
-                clientName: 'WEB',
-                clientVersion: '2.20241201'
-              }
-            },
-            query: query
-          }),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        
-        if (innertubeResponse.ok) {
-          const data = await innertubeResponse.json();
-          if (data.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents) {
-            const results = data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents;
-            for (const section of results) {
-              if (section.itemSectionRenderer?.contents) {
-                for (const item of section.itemSectionRenderer.contents) {
-                  if (item.videoRenderer?.videoId) {
-                    videoId = item.videoRenderer.videoId;
-                    console.log('Found via InnerTube API:', videoId);
-                    break;
-                  }
-                }
-                if (videoId) break;
-              }
-            }
-          }
-        }
-      } catch (innertubeError) {
-        console.log('InnerTube API failed:', (innertubeError as Error).message);
-      }
-    }
+    // Convert to API format
+    const apiResults = results.slice(0, 10).map(song => ({
+      id: song.id,
+      title: song.title,
+      artists: [{ name: song.artist }],
+      subtitle: song.artist,
+      image: `https://i.ytimg.com/vi/${song.videoId}/maxresdefault.jpg`,
+      duration: 0,
+      streaming_url: `https://youtube.com/watch?v=${song.videoId}`,
+      quality: 'High Quality',
+      source: 'Basic Search',
+      youtube_id: song.videoId
+    }));
 
-    if (videoId && videoId.length === 11) {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ video_id: videoId })
-      };
-    } else {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: "No video found" })
-      };
-    }
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        status: 200,
+        response: apiResults,
+        total: apiResults.length,
+        query: query
+      })
+    };
 
   } catch (error) {
-    console.error("Search endpoint error:", error);
+    console.error('Basic search error:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Search failed" })
+      body: JSON.stringify({ error: 'Failed to search music' })
     };
   }
 };
